@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import {auth} from '../firebase'
 
 Vue.use(VueRouter)
 
@@ -17,12 +18,29 @@ const routes = [
   {
     path: '/dashboard',
     name: 'Dashboard',
-    component: () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue')
+    component: () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue'),
+    meta: { requiresAuth: true }
   },
 ]
 
 const router = new VueRouter({
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    
+    const user = auth.currentUser
+    
+    if(!user){
+      next({ path: '/'} )
+    }else{
+      next()
+    }
+
+  }else{
+    next()
+  }
 })
 
 export default router

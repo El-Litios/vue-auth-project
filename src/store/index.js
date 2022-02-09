@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {auth} from '../firebase'
+import {auth, db} from '../firebase'
 import router from '../router'
 
 Vue.use(Vuex)
@@ -28,8 +28,17 @@ export default new Vuex.Store({
           email: res.user.email,
           id: res.user.uid
         }
-        commit('setUser', user)
-        router.push('/dashboard')
+
+        db.collection(res.user.uid).add({
+          nombre: 'tarea'
+        }).then(doc => {
+          commit('setUser', user)
+          router.push('/dashboard')
+        }).catch(err => {
+          console.log(err);
+        })
+
+        
       })
       .catch(err => {
         console.log(err);
@@ -52,11 +61,38 @@ export default new Vuex.Store({
           console.log(err);
           commit('setError', err)
         })
+    },
+
+    async logoutUser({commit}){
+      await auth.signOut()
+        .then(res => {
+          
+          router.push('/')
+        })
+        .catch(err => {
+          console.log(err);
+          commit('setError', err)
+        })
+    },
+
+    detectUser({commit}, userobj){
+      commit('setUser', userobj)
     }
 
     
 
   },
+
+  getters: {
+    userExists(state){
+      if(state.user === null){
+        return false
+      }else{
+        return true
+      }
+    }
+  },
+
   modules: {
   }
 })

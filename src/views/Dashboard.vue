@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="user">
         <h1>PROTEGIDO</h1>
 
         <h5>{{user.email}}</h5>
