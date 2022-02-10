@@ -8,7 +8,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     user: null,
-    error: null
+    error: null,
+    tareas: []
   },
   mutations: {
     setUser(state, payload){
@@ -17,6 +18,10 @@ export default new Vuex.Store({
 
     setError(state, payload){
       state.error = payload
+    },
+
+    setTasks(state, payload){
+      state.tareas = payload
     }
 
   },
@@ -77,6 +82,22 @@ export default new Vuex.Store({
 
     detectUser({commit}, userobj){
       commit('setUser', userobj)
+    },
+
+
+    async getTasks({commit, state}){
+      const tasks = []
+      await db.collection(state.user.id).get()
+        .then(res => {
+          res.forEach(doc => {
+            console.log(doc.id)
+            console.log(doc.data())
+            let task = doc.data()
+            task.id = doc.id
+            tasks.push(task)
+          })
+          commit('setTasks', tasks)
+        })
     }
 
     
