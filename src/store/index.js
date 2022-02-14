@@ -9,7 +9,8 @@ export default new Vuex.Store({
   state: {
     user: null,
     error: null,
-    tareas: []
+    tareas: [],
+    tarea: {nombre: '', id: ''}
   },
   mutations: {
     setUser(state, payload){
@@ -22,6 +23,14 @@ export default new Vuex.Store({
 
     setTasks(state, payload){
       state.tareas = payload
+    },
+
+    setTaskById(state, payload){
+      state.tarea = payload
+    },
+
+    unsetTaskAfterDelete(state, payload){
+      state.tareas = state.tareas.filter(t => t.id !== payload)
     }
 
   },
@@ -98,7 +107,49 @@ export default new Vuex.Store({
           })
           commit('setTasks', tasks)
         })
+    },
+
+
+    //TAREAS
+
+    async getTaskById({commit, state}, id){
+      await db.collection(state.user.id).doc(id).get()
+        .then(doc => {
+          let task = doc.data()
+          task.id = doc.id
+          commit('setTaskById', task)
+        })
+        .catch(err => console.log(err))
+    },
+
+    async SaveTaskChanges({commit, state}, task){
+      await db.collection(state.user.id).doc(task.id).update({
+        nombre: task.nombre
+      })
+      .then(() => {
+        router.push({name: 'Dashboard'})
+      })
+      .catch(err => console.log(err))
+    },
+
+    async SaveTask({commit, state}, name){
+      await db.collection(state.user.id).add({
+        nombre: name
+      })
+      .then(() => {
+        router.push({name: 'Dashboard'})
+      })
+      .catch(err => console.log(err))
+    },
+
+    async DeleteTask({commit, state}, id){
+      await db.collection(state.user.id).doc(id).delete()
+        .then(() => {
+          commit('unsetTaskAfterDelete', id)
+        })
+        .catch(err => console.log(err))
     }
+
 
     
 

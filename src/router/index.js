@@ -21,6 +21,19 @@ const routes = [
     component: () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue'),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/taskedition/:id',
+    name: 'TaskEdition',
+    component: () => import(/* webpackChunkName: "taskedition" */ '../views/TaskEdition.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/taskadd',
+    name: 'TaskAdd',
+    component: () => import(/* webpackChunkName: "taskadd" */ '../views/TaskAdd.vue'),
+    meta: { requiresAuth: true }
+  },
+
 ]
 
 const router = new VueRouter({
